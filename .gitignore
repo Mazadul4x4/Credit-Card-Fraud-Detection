@@ -1,0 +1,5 @@
+data/raw_data/
+models/
+_pycache_/
+*.pyc
+

@@ -1,54 +1,54 @@
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 
 
 def load_data(path):
-    """Load dataset from CSV."""
+    """
+    Load the dataset from CSV.
+    """
     return pd.read_csv(path)
 
 
-def drop_columns(df):
-    columns = [
-        "Unnamed: 0",
-        "trans_num",
-        "first",
-        "last",
-        "street"
-    ]
-
-    existing = [col for col in columns if col in df.columns]
-    return df.drop(columns=existing)
+def check_missing_values(df):
+    """
+    Check for missing values.
+    """
+    print("Missing Values:")
+    print(df.isnull().sum())
+    return df
 
 
-def fill_missing(df):
-    numeric_cols = df.select_dtypes(include="number").columns
-    categorical_cols = df.select_dtypes(include="object").columns
+def remove_duplicates(df):
+    """
+    Remove duplicate rows.
+    """
+    duplicates = df.duplicated().sum()
+    print(f"Duplicate rows: {duplicates}")
 
-    for col in numeric_cols:
-        df[col] = df[col].fillna(df[col].median())
-
-    for col in categorical_cols:
-        df[col] = df[col].fillna(df[col].mode()[0])
+    df = df.drop_duplicates()
 
     return df
 
 
-def encode(df):
-    encoder = LabelEncoder()
-
-    categorical_cols = df.select_dtypes(include="object").columns
-
-    for col in categorical_cols:
-        df[col] = encoder.fit_transform(df[col])
-
-    return df
-
-
-def scale(df, target):
-    X = df.drop(target, axis=1)
-    y = df[target]
+def scale_amount(df):
+    """
+    Scale only the Amount column.
+    """
 
     scaler = StandardScaler()
-    X = scaler.fit_transform(X)
 
-    return X, y, scaler
+    df["Amount"] = scaler.fit_transform(df[["Amount"]])
+
+    return df, scaler
+
+
+def split_features_target(df):
+    """
+    Split dataset into features (X) and target (y).
+    """
+
+    X = df.drop("Class", axis=1)
+
+    y = df["Class"]
+
+    return X, y
