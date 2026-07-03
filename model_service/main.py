@@ -37,3 +37,9 @@ def predict(
     )
 
     return prediction
+
+@app.get("/predictions", response_model=list[schemas.PredictionResponse])
+def get_predictions(
+    db: Session = Depends(get_db),
+):
+    return crud.get_predictions(db)

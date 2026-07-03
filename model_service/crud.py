@@ -22,3 +22,12 @@ def create_prediction(
     db.refresh(prediction)
 
     return prediction
+
+
+def get_predictions(db: Session):
+    return (
+        db.query(models.Prediction)
+        .order_by(models.Prediction.id.desc())
+        .all()
+    )
+    
