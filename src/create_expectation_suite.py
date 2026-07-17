@@ -14,4 +14,34 @@ except Exception:
     suite = context.suites.get("creditcard_suite")
     print("✓ Expectation Suite already exists.")
 
-print(suite)
+# Add expectations
+suite.add_expectation(
+    gx.expectations.ExpectColumnValuesToNotBeNull(
+        column="Class"
+    )
+)
+
+suite.add_expectation(
+    gx.expectations.ExpectColumnValuesToBeInSet(
+        column="Class",
+        value_set=[0, 1],
+    )
+)
+
+suite.add_expectation(
+    gx.expectations.ExpectColumnValuesToBeBetween(
+        column="Amount",
+        min_value=0,
+    )
+)
+
+suite.add_expectation(
+    gx.expectations.ExpectColumnValuesToBeBetween(
+        column="Time",
+        min_value=0,
+    )
+)
+
+context.suites.add_or_update(suite)
+
+print("✓ Expectations saved successfully.")

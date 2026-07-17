@@ -10,14 +10,10 @@ context = gx.get_context(
 checkpoint = context.checkpoints.get("creditcard_checkpoint")
 
 # Read a sample of your dataset
-df = pd.read_csv("/opt/airflow/data/raw_data/creditcard.csv").head(100)
+df = pd.read_csv("/opt/airflow/data/good_data/train.csv").head(100)
 
 # Run validation
-result = checkpoint.run(
-    batch_parameters={
-        "dataframe": df
-    }
-)
+result = checkpoint.run()
 
 print("Validation Success:", result.success)
 

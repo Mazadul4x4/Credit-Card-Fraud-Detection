@@ -14,3 +14,13 @@ __pycache__/
 *.pyc
 # Environment
 .env
+# Great Expectations generated files
+src/gx/gx/uncommitted/
+src/gx/gx/gx/
+*.ge_store_backend_id
+
+# Archived data
+data/archived_data/
+
+# Data Docs
+*.html
