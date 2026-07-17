@@ -1,5 +1,16 @@
-data/raw_data/
-models/
-_pycache_/
-*.pyc
+# macOS
+.DS_Store
 
+# Airflow
+airflow/logs/
+
+# Data
+data/raw_data/
+data/good_data/
+data/bad_data/
+
+# Python
+__pycache__/
+*.pyc
+# Environment
+.env

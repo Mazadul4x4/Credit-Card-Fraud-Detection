@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.bash import BashOperator
+from airflow.providers.standard.operators.bash import BashOperator
 
 with DAG(
     dag_id="credit_card_ingestion",
@@ -11,14 +11,16 @@ with DAG(
     tags=["credit-card", "ingestion"],
 ) as dag:
 
-    split_data = BashOperator(
-        task_id="split_data",
-        bash_command="python /opt/airflow/project/src/split_data.py",
-    )
+   split_data = BashOperator(
+    task_id="split_data",
+    cwd="/opt/airflow",
+    bash_command="/home/airflow/.local/bin/python /opt/airflow/src/split_data.py",
+)
 
-    generate_bad_data = BashOperator(
-        task_id="generate_bad_data",
-        bash_command="python /opt/airflow/project/src/generate_errors.py",
-    )
+generate_bad_data = BashOperator(
+    task_id="generate_bad_data",
+    cwd="/opt/airflow",
+    bash_command="/home/airflow/.local/bin/python /opt/airflow/src/generate_errors.py",
+)
 
-    split_data >> generate_bad_data
+split_data >> generate_bad_data
