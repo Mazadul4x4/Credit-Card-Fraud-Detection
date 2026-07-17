@@ -12,12 +12,15 @@ services:
      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://dsp:yourRealPassword123@db:5432/airflow
      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
      AIRFLOW__API_AUTH__JWT_SECRET: 23afb37d11ea439d502d283d0bb99afebb78e63af3c94ab08f3b69e16f5f440b
+     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/simple_auth_manager_passwords.json
+     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:admin
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/opt/airflow/src
       - ./data:/opt/airflow/data
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config/simple_auth_manager_passwords.json:/opt/airflow/simple_auth_manager_passwords.json
     command: >
       bash -c "
       airflow db migrate
@@ -38,12 +41,15 @@ services:
      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
      AIRFLOW__API_AUTH__JWT_SECRET: 23afb37d11ea439d502d283d0bb99afebb78e63af3c94ab08f3b69e16f5f440b
+     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/simple_auth_manager_passwords.json
+     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:admin    
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/opt/airflow/src
       - ./data:/opt/airflow/data
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config/simple_auth_manager_passwords.json:/opt/airflow/simple_auth_manager_passwords.json
     command: api-server
 
   airflow-scheduler:
@@ -59,12 +65,15 @@ services:
      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
      AIRFLOW__API_AUTH__JWT_SECRET: 23afb37d11ea439d502d283d0bb99afebb78e63af3c94ab08f3b69e16f5f440b
+     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/simple_auth_manager_passwords.json
+     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:admin
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/opt/airflow/src
       - ./data:/opt/airflow/data
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config/simple_auth_manager_passwords.json:/opt/airflow/simple_auth_manager_passwords.json
     command: scheduler
 
   airflow-dag-processor:
@@ -80,10 +89,13 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-webserver:8080/execution/
       AIRFLOW__API_AUTH__JWT_SECRET: 23afb37d11ea439d502d283d0bb99afebb78e63af3c94ab08f3b69e16f5f440b
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/simple_auth_manager_passwords.json
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:admin
     volumes:
       - ./dags:/opt/airflow/dags
       - ./src:/opt/airflow/src
       - ./data:/opt/airflow/data
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config/simple_auth_manager_passwords.json:/opt/airflow/simple_auth_manager_passwords.json
     command: dag-processor

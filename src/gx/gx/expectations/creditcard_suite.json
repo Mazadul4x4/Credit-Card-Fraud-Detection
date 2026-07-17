@@ -1,0 +1,60 @@
+{
+  "expectations": [
+    {
+      "id": "1c19f386-cde9-4919-ba9a-75ac4e00edb1",
+      "kwargs": {
+        "column": "Amount"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "1f481071-4bc9-4a90-a63e-a7e3bd7eb745",
+      "kwargs": {
+        "column": "Class"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "8a763ed6-a725-4fca-b842-6a9030b7f1bc",
+      "kwargs": {
+        "column": "Amount"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "e8379ee6-8f23-4b60-abf1-a71293050f5c",
+      "kwargs": {
+        "column": "Amount",
+        "min_value": 0.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "id": "f878e72b-c82f-43ea-8a32-714f8dce08bf",
+      "kwargs": {
+        "column": "Class",
+        "value_set": [
+          0,
+          1
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_in_set"
+    }
+  ],
+  "id": "a47f5a15-5ba3-4a58-9a68-a845facf7ad8",
+  "meta": {
+    "great_expectations_version": "1.19.0"
+  },
+  "name": "creditcard_suite",
+  "notes": null
+}
