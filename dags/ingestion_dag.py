@@ -89,13 +89,18 @@ def credit_card_ingestion():
     @task
     def save_statistics(validation_result: dict) -> dict: 
         file_path = validation_result["file_path"]
-        df = pd.read_csv(file_path)
+        
 
         hook = PostgresHook(postgres_conn_id="postgres_default")
 
         filename = Path(file_path).name
-        records_processed = len(df)
-        records_loaded = len(df) if validation_result["validation_success"] else 0
+        records_processed = validation_result["total_rows"] # type: ignore
+        records_loaded = (
+        validation_result["total_rows"]
+        if validation_result["validation_success"]
+        else 0
+        )  
+        
         status = "SUCCESS" if validation_result["validation_success"] else "FAILED"
 
         hook.run(
@@ -200,7 +205,7 @@ def credit_card_ingestion():
       return {
         **validation_result,
         "destination": str(destination),
-    }
+      }
 
     raw_data = read_data()
     validated = validate_data(raw_data)
