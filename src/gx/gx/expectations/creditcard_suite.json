@@ -1,0 +1,9 @@
+{
+  "expectations": [],
+  "id": "c5459fc7-7c57-443e-826f-c8e4256911a5",
+  "meta": {
+    "great_expectations_version": "1.19.0"
+  },
+  "name": "creditcard_suite",
+  "notes": null
+}

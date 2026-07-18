@@ -1,0 +1,22 @@
+{
+  "data": {
+    "asset": {
+      "id": "a9330e08-96a6-4e5f-ace0-feec83c8ef8d",
+      "name": "creditcard_csv"
+    },
+    "batch_definition": {
+      "id": "6446d8b4-31f5-4a8a-a331-93d55d2a908c",
+      "name": "whole_file"
+    },
+    "datasource": {
+      "id": "126ca0cf-1b99-4c9d-9f0f-96b56ae715fb",
+      "name": "pandas"
+    }
+  },
+  "id": "5537294c-6f46-43c3-bdbd-439c7e8a5441",
+  "name": "creditcard_validation",
+  "suite": {
+    "id": "c5459fc7-7c57-443e-826f-c8e4256911a5",
+    "name": "creditcard_suite"
+  }
+}
