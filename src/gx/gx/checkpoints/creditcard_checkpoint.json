@@ -1,0 +1,12 @@
+{
+  "actions": [],
+  "id": "3dcad070-aef3-4dfa-a8db-ef432feffc02",
+  "name": "creditcard_checkpoint",
+  "result_format": "SUMMARY",
+  "validation_definitions": [
+    {
+      "id": "5537294c-6f46-43c3-bdbd-439c7e8a5441",
+      "name": "creditcard_validation"
+    }
+  ]
+}
