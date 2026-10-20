@@ -1,0 +1,9 @@
+# Installed on top of apache/airflow:3.0.2-python3.12 WITH the official Airflow
+# constraints file (see Dockerfile), so nothing in Airflow gets upgraded by accident.
+# numpy / pandas / scikit-learn / joblib versions must match model_service/requirements.txt.
+apache-airflow==3.0.2
+great_expectations==1.24.0
+numpy==1.26.4
+pandas==2.1.4
+scikit-learn==1.6.1
+joblib==1.5.1

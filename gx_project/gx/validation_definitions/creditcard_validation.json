@@ -1,0 +1,22 @@
+{
+  "data": {
+    "asset": {
+      "id": "2006316c-56bb-49b1-9f78-18baa4c4a744",
+      "name": "ingested_file"
+    },
+    "batch_definition": {
+      "id": "2c478837-92e7-4fdc-8fa7-095388dbcb04",
+      "name": "whole_file"
+    },
+    "datasource": {
+      "id": "388ac7ba-39c7-4f2f-8e07-cd709f7d2f73",
+      "name": "pandas_runtime"
+    }
+  },
+  "id": "572e80e2-9253-42b0-80f6-ad596d9823a2",
+  "name": "creditcard_validation",
+  "suite": {
+    "id": "524405ed-521d-4fae-9185-166d7d7144f1",
+    "name": "creditcard_suite"
+  }
+}

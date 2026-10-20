@@ -81,17 +81,17 @@ data_docs_sites:
     site_index_builder:
       class_name: DefaultSiteIndexBuilder
 fluent_datasources:
-  pandas:
+  pandas_runtime:
     type: pandas
-    id: 126ca0cf-1b99-4c9d-9f0f-96b56ae715fb
+    id: 388ac7ba-39c7-4f2f-8e07-cd709f7d2f73
     assets:
-      creditcard_csv:
-        type: csv
-        id: a9330e08-96a6-4e5f-ace0-feec83c8ef8d
+      ingested_file:
+        type: dataframe
+        id: 2006316c-56bb-49b1-9f78-18baa4c4a744
+        batch_metadata: {}
         batch_definitions:
           whole_file:
-            id: 6446d8b4-31f5-4a8a-a331-93d55d2a908c
+            id: 2c478837-92e7-4fdc-8fa7-095388dbcb04
             partitioner:
-        filepath_or_buffer: /opt/airflow/data/raw_data/train.csv
 analytics_enabled:
-data_context_id: d240ef79-41c8-4c83-bc5f-bf4582d48470
+data_context_id: 9acdc311-281e-45c9-a431-81ced92dc3ee

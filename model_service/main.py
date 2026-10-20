@@ -1,27 +1,26 @@
-import pandas as pd
+import logging
 from contextlib import asynccontextmanager
-from pathlib import Path
+from datetime import date
+from typing import Literal, Optional
 
-from fastapi import FastAPI, Depends
+import pandas as pd
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
-import joblib
 
+from model_service import crud, schemas
+from model_service.config import MODEL_METADATA_PATH, MODEL_PATH
 from model_service.database import Base, engine, get_db
-from model_service import models, schemas, crud
-from model_service.config import MODEL_VERSION
+from model_service.features import FEATURE_COLUMNS
+from model_service.ml import load_model_from_file
 
-Base.metadata.create_all(bind=engine)
-
-MODEL_PATH = Path("/opt/airflow/models/fraud_model.joblib")
+logger = logging.getLogger("uvicorn.error")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if not MODEL_PATH.exists():
-        raise FileNotFoundError(f"Model file not found: {MODEL_PATH}")
-
-    app.state.model = joblib.load(MODEL_PATH)
-    print(f"Model loaded from {MODEL_PATH}")
+    # Runs ONCE at startup: create tables and load the model (not on every request)
+    Base.metadata.create_all(bind=engine)
+    app.state.model, app.state.model_version = load_model_from_file(MODEL_PATH, MODEL_METADATA_PATH)
     yield
 
 
@@ -32,58 +31,98 @@ app = FastAPI(
 )
 
 
-@app.get("/")
-def home():
-    return {"message": "Credit Card Fraud Detection API is running"}
+def get_model(request: Request):
+    """Dependency: the loaded model, or 503 if no model is available."""
+    if request.app.state.model is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No model loaded. Train one with src/train.py and restart the API.",
+        )
+    return request.app.state.model
 
 
-@app.get("/health")
-def health():
-    return {"status": "healthy"}
-
-
-@app.post("/predict")
-def predict(
-    request: schemas.BatchPredictionRequest,
-    db: Session = Depends(get_db),
-):
-    model = app.state.model
-
-    # Convert request to DataFrame
-    transactions = request.transactions
-    df = pd.DataFrame(
-        [transaction.model_dump() for transaction in transactions]
+@app.get("/health", response_model=schemas.HealthResponse)
+def health(request: Request):
+    return schemas.HealthResponse(
+        status="ok",
+        model_loaded=request.app.state.model is not None,
+        model_version=request.app.state.model_version,
     )
 
-    print(f"Received {len(df)} transactions")
 
-    # Make predictions
-    predicted_classes = model.predict(df)
-    probabilities = model.predict_proba(df)[:, 1]
+@app.post("/predict", response_model=schemas.PredictionResponse)
+def predict(
+    body: schemas.PredictionRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    model=Depends(get_model),
+):
+    """Batch prediction: one call for one or many transactions (webapp and Airflow)."""
+    transactions = [t.model_dump() for t in body.transactions]
+    features = pd.DataFrame(transactions)[FEATURE_COLUMNS]
 
-    results = []
+    try:
+        predictions = model.predict(features).tolist()
+        probabilities = model.predict_proba(features)[:, 1].tolist()
+    except Exception as exc:
+        logger.exception("Prediction failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Prediction failed: {exc}",
+        ) from exc
 
-    # Save predictions to database
-    for predicted_class, probability in zip(predicted_classes, probabilities):
-        prediction = crud.create_prediction(
-            db=db,
-            predicted_class=int(predicted_class),
-            probability=float(probability),
-            source="Prediction DAG",
-            model_version=MODEL_VERSION,
+    version = request.app.state.model_version
+    rows = crud.save_predictions(db, transactions, predictions, probabilities, body.source, version)
+    return schemas.PredictionResponse(
+        model_version=version,
+        source=body.source,
+        count=len(rows),
+        predictions=[
+            schemas.PredictionItem(
+                id=row.id,
+                transaction_id=row.transaction_id,
+                prediction=row.prediction,
+                label="fraud" if row.prediction == 1 else "legit",
+                fraud_probability=round(row.fraud_probability, 4),
+            )
+            for row in rows
+        ],
+    )
+
+
+@app.get("/past-predictions", response_model=schemas.PastPredictionsResponse)
+def past_predictions(
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
+    source: Literal["all", "webapp", "scheduled"] = "all",
+    limit: int = Query(default=1000, ge=1, le=10_000),
+    db: Session = Depends(get_db),
+):
+    if start_date and end_date and start_date > end_date:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="start_date must be before or equal to end_date",
         )
+    rows = crud.get_past_predictions(db, start_date, end_date, source, limit)
+    return schemas.PastPredictionsResponse(count=len(rows), predictions=[_to_past(r) for r in rows])
 
-        results.append(
-            {
-                "id": prediction.id,
-                "predicted_class": prediction.predicted_class,
-                "probability": prediction.probability,
-                "source": prediction.source,
-                "model_version": prediction.model_version,
-            }
-        )
 
-    return {
-        "predictions": results,
-        "total_predictions": len(results),
-    }
+@app.get("/past-predictions/{prediction_id}", response_model=schemas.PastPrediction)
+def past_prediction(prediction_id: int, db: Session = Depends(get_db)):
+    row = crud.get_prediction(db, prediction_id)
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Prediction not found")
+    return _to_past(row)
+
+
+def _to_past(row) -> schemas.PastPrediction:
+    return schemas.PastPrediction(
+        id=row.id,
+        created_at=row.created_at,
+        source=row.source,
+        model_version=row.model_version,
+        transaction_id=row.transaction_id,
+        prediction=row.prediction,
+        fraud_probability=row.fraud_probability,
+        features=crud.features_of(row),
+    )

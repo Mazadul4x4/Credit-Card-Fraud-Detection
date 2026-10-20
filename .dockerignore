@@ -1,0 +1,13 @@
+.git
+.github
+.env
+data
+models
+gx_project
+airflow/logs
+**/__pycache__
+**/*.pyc
+.venv
+venv
+tests
+*.csv
