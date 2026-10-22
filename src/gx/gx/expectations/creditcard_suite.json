@@ -1,5 +1,135 @@
 {
-  "expectations": [],
+  "expectations": [
+    {
+      "id": "dfab5d15-db23-4e06-adb6-266afb19efb8",
+      "kwargs": {
+        "column": "Amount"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "ccf92ea0-1926-4f7b-a2c2-cc2128aec7f3",
+      "kwargs": {
+        "column": "Amount"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "8770bfd4-bbda-4bf5-90da-cc4bda697c7e",
+      "kwargs": {
+        "column": "Amount",
+        "max_value": 50000.0,
+        "min_value": 0.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "id": "72386961-8747-4c5f-9594-49b6b93e2135",
+      "kwargs": {
+        "column": "Time"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "4dd3bdab-ccff-4632-b7bb-30892e77096b",
+      "kwargs": {
+        "column": "Time"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "ace4311d-e323-4634-adbb-5fbe4d56c821",
+      "kwargs": {
+        "column": "Time",
+        "min_value": 0.0
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_between"
+    },
+    {
+      "id": "0eeb44c1-49a6-474b-bcb8-471ed46433af",
+      "kwargs": {
+        "column": "Class"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "75d303c3-3d4e-4e95-b26f-873e585c8cb0",
+      "kwargs": {
+        "column": "Class",
+        "value_set": [
+          0,
+          1
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_values_to_be_in_set"
+    },
+    {
+      "id": "33865716-69b5-4304-86a2-fdd895a78a5b",
+      "kwargs": {
+        "column_list": [
+          "Time",
+          "Amount",
+          "V1",
+          "V2"
+        ]
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_compound_columns_to_be_unique"
+    },
+    {
+      "id": "fb13087c-9bc0-4438-899d-43d8442876c2",
+      "kwargs": {
+        "column": "V1"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "9de1a815-882e-44f0-abc1-ee710e849cef",
+      "kwargs": {
+        "column": "V2"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "0de7eeae-c4d3-43d8-982c-e5eeaa3f2592",
+      "kwargs": {
+        "column": "V3"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    },
+    {
+      "id": "c05c7ae1-9bc3-441d-8990-dda1a7345a55",
+      "kwargs": {
+        "column": "V4"
+      },
+      "meta": {},
+      "severity": "critical",
+      "type": "expect_column_to_exist"
+    }
+  ],
   "id": "c5459fc7-7c57-443e-826f-c8e4256911a5",
   "meta": {
     "great_expectations_version": "1.19.0"

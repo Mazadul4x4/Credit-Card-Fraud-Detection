@@ -5,8 +5,8 @@
   "result_format": "SUMMARY",
   "validation_definitions": [
     {
-      "id": "5537294c-6f46-43c3-bdbd-439c7e8a5441",
-      "name": "creditcard_validation"
+      "id": "277cf72f-3ad1-41a8-b757-6ec6d554ffe6",
+      "name": "transaction_validation"
     }
   ]
 }

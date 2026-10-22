@@ -1,47 +1,20 @@
-import great_expectations as gx
+"""Create expectation suite for creditcard data."""
 
-context = gx.get_context(
-    mode="file",
-    project_root_dir="/opt/airflow/src/gx/gx",
-)
+from __future__ import annotations
 
-# Create or load the suite
-try:
-    suite = gx.ExpectationSuite(name="creditcard_suite")
-    suite = context.suites.add(suite)
-    print("✓ Expectation Suite created.")
-except Exception:
-    suite = context.suites.get("creditcard_suite")
-    print("✓ Expectation Suite already exists.")
+import logging
 
-# Add expectations
-suite.add_expectation(
-    gx.expectations.ExpectColumnValuesToNotBeNull(
-        column="Class"
-    )
-)
+from src.gx_validator import configure_suite, get_gx_context
 
-suite.add_expectation(
-    gx.expectations.ExpectColumnValuesToBeInSet(
-        column="Class",
-        value_set=[0, 1],
-    )
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
-suite.add_expectation(
-    gx.expectations.ExpectColumnValuesToBeBetween(
-        column="Amount",
-        min_value=0,
-    )
-)
 
-suite.add_expectation(
-    gx.expectations.ExpectColumnValuesToBeBetween(
-        column="Time",
-        min_value=0,
-    )
-)
+def main() -> None:
+    context = get_gx_context()
+    suite = configure_suite(context)
+    logger.info(f"Expectation suite ready: {suite.name}")
 
-context.suites.add_or_update(suite)
 
-print("✓ Expectations saved successfully.")
+if __name__ == "__main__":
+    main()

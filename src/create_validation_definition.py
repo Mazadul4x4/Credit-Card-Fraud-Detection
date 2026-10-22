@@ -1,39 +1,21 @@
-import great_expectations as gx
+"""Create validation definition for creditcard data."""
 
-context = gx.get_context(
-    mode="file",
-    project_root_dir="/opt/airflow/src/gx/gx",
-)
+from __future__ import annotations
 
-# Get datasource
-datasource = context.data_sources.get("pandas")
+import logging
 
-# Get asset
-asset = datasource.get_asset("creditcard_dataframe")
+from src.gx_validator import configure_suite, get_gx_context, setup_checkpoint_for_dataframe
 
-# Get batch definition
-batch_definition = asset.get_batch_definition(
-    "creditcard_batch"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
-# Get expectation suite
-suite = context.suites.get("creditcard_suite")
 
-# Create validation definition
-try:
-    validation_definition = gx.ValidationDefinition(
-        name="creditcard_validation",
-        data=batch_definition,
-        suite=suite,
-    )
+def main() -> None:
+    context = get_gx_context()
+    suite = configure_suite(context)
+    checkpoint = setup_checkpoint_for_dataframe(context, suite)
+    logger.info(f"Validation definition and checkpoint ready: {checkpoint.name}")
 
-    context.validation_definitions.add(validation_definition)
 
-    print("✓ Validation Definition created.")
-
-except Exception:
-    validation_definition = context.validation_definitions.get(
-        "creditcard_validation"
-    )
-
-    print("✓ Validation Definition already exists.")
+if __name__ == "__main__":
+    main()

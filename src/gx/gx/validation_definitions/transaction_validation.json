@@ -1,0 +1,22 @@
+{
+  "data": {
+    "asset": {
+      "id": "a17b164d-a61b-4608-aef4-429aebba3d61",
+      "name": "transaction_dataframe"
+    },
+    "batch_definition": {
+      "id": "fd9c493c-69aa-4d55-9722-b253206a61a6",
+      "name": "default_batch"
+    },
+    "datasource": {
+      "id": "73be17c3-afbb-4aec-8c25-5360a683547c",
+      "name": "pandas_datasource"
+    }
+  },
+  "id": "277cf72f-3ad1-41a8-b757-6ec6d554ffe6",
+  "name": "transaction_validation",
+  "suite": {
+    "id": "c5459fc7-7c57-443e-826f-c8e4256911a5",
+    "name": "creditcard_suite"
+  }
+}
