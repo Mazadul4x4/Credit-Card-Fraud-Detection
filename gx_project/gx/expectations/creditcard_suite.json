@@ -1,0 +1,871 @@
+{
+  "expectations": [
+    {
+      "id": "06ae1c22-91d9-46e8-b07e-22156e5c9b8c",
+      "kwargs": {
+        "column_set": [
+          "transaction_id",
+          "Time",
+          "V1",
+          "V2",
+          "V3",
+          "V4",
+          "V5",
+          "V6",
+          "V7",
+          "V8",
+          "V9",
+          "V10",
+          "V11",
+          "V12",
+          "V13",
+          "V14",
+          "V15",
+          "V16",
+          "V17",
+          "V18",
+          "V19",
+          "V20",
+          "V21",
+          "V22",
+          "V23",
+          "V24",
+          "V25",
+          "V26",
+          "V27",
+          "V28",
+          "Amount",
+          "time_period",
+          "Class"
+        ],
+        "exact_match": false
+      },
+      "meta": {
+        "category": "schema"
+      },
+      "severity": "critical",
+      "type": "expect_table_columns_to_match_set"
+    },
+    {
+      "id": "1f9cad3b-8a7a-4fa8-b80e-47330e77c692",
+      "kwargs": {
+        "column": "transaction_id"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "2119946a-286e-4bbc-ac56-ad9091ca8f52",
+      "kwargs": {
+        "column": "Time"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "984549b8-eb87-46f3-96dc-aafd605576c9",
+      "kwargs": {
+        "column": "V1"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "6bdf889e-1c4b-47f2-a31c-394405bb0824",
+      "kwargs": {
+        "column": "V2"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "15d41f91-509c-46b8-9b09-e1f494b8370f",
+      "kwargs": {
+        "column": "V3"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "4cb6d1b2-ad7b-4cd2-ac36-3557b5d9148c",
+      "kwargs": {
+        "column": "V4"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "2ea7cb01-7dd4-4f15-ab2f-630c2f88ad55",
+      "kwargs": {
+        "column": "V5"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "797074e1-3752-4569-9777-6764771245ef",
+      "kwargs": {
+        "column": "V6"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "a1b152fb-19db-4fbf-ac6f-cb57c95efdb3",
+      "kwargs": {
+        "column": "V7"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "4a54301e-eceb-40e5-9743-e261ac935210",
+      "kwargs": {
+        "column": "V8"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "ec3a0b70-525c-4759-bd0d-78de3708527b",
+      "kwargs": {
+        "column": "V9"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "70617ac0-9d53-47b6-b78a-0fdce14d4b0d",
+      "kwargs": {
+        "column": "V10"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "127f3143-b3ea-4802-a63b-7f488309ed29",
+      "kwargs": {
+        "column": "V11"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "dd65a578-abda-4737-9a4e-1b85543d6500",
+      "kwargs": {
+        "column": "V12"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "1189e36c-76e8-48ad-a092-716a518614f3",
+      "kwargs": {
+        "column": "V13"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "df3c173e-7e73-4e64-8aaf-f808188c38b5",
+      "kwargs": {
+        "column": "V14"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "4de83abd-1cc2-4037-87c0-3c8ed2b1c2f3",
+      "kwargs": {
+        "column": "V15"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "4943f4ce-e6d3-406a-a6f6-16c7b6c8c40c",
+      "kwargs": {
+        "column": "V16"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "1ef82c70-22b3-481e-891c-578112ca93ae",
+      "kwargs": {
+        "column": "V17"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "e1b611a4-565c-437e-8dc1-13d4f5d7e95b",
+      "kwargs": {
+        "column": "V18"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "1e6f5e24-be8b-4b2e-abc4-014f04656099",
+      "kwargs": {
+        "column": "V19"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "3ef42654-5567-4e26-a35a-a1108792dd00",
+      "kwargs": {
+        "column": "V20"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "54ef48dd-51e0-4f88-bd87-eea05dcb6ddb",
+      "kwargs": {
+        "column": "V21"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "ceed8ec1-e4da-4d50-a767-a15511120976",
+      "kwargs": {
+        "column": "V22"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "709bf191-49c0-4ef8-b97f-6c9b8345761b",
+      "kwargs": {
+        "column": "V23"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "38b7867a-bd1e-4bfb-8086-43b885687a3e",
+      "kwargs": {
+        "column": "V24"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "61f377b0-059d-4b50-ab73-3f9729aa6731",
+      "kwargs": {
+        "column": "V25"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "1e09ed1b-aeae-4f12-8974-b66ca2e183c4",
+      "kwargs": {
+        "column": "V26"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "734e1c46-b437-4f6c-ad87-3accff7c33fc",
+      "kwargs": {
+        "column": "V27"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "75ab431d-69ec-4fd6-9648-3162fca16e57",
+      "kwargs": {
+        "column": "V28"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "ea8478c7-f06c-415d-be8b-9480a4873b74",
+      "kwargs": {
+        "column": "Amount"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "6b0a9263-ee1d-4f3a-aad0-71202c0ceb91",
+      "kwargs": {
+        "column": "time_period"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "0c4180eb-78ca-425a-8331-014d70187524",
+      "kwargs": {
+        "column": "Class"
+      },
+      "meta": {
+        "category": "completeness"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "ec23cb80-fe8d-45a2-a56e-6f464b20bf8c",
+      "kwargs": {
+        "column": "Time",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "2d106361-d661-4195-89a8-36e72510b18e",
+      "kwargs": {
+        "column": "V1",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "7cc66682-481b-4d71-a4d7-ff14f6390445",
+      "kwargs": {
+        "column": "V2",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "fb39efec-aaef-46b7-a55e-706034896897",
+      "kwargs": {
+        "column": "V3",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "8ca5a863-50f7-435b-8c82-dcc5e519509d",
+      "kwargs": {
+        "column": "V4",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "5df94f37-d81e-402e-8cc6-04d0bd10e865",
+      "kwargs": {
+        "column": "V5",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "ee301776-9569-4dd5-9c09-fbbb72513c38",
+      "kwargs": {
+        "column": "V6",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "28415cbb-57e9-4467-b827-5942cfb2d019",
+      "kwargs": {
+        "column": "V7",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "aa34d5b5-ff5c-469f-aefa-9e31e69d3f5c",
+      "kwargs": {
+        "column": "V8",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "ae93df33-b306-4637-8a16-459f84a6dc04",
+      "kwargs": {
+        "column": "V9",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "a93dc7d6-5874-4d2b-a3d7-242ceb0018c4",
+      "kwargs": {
+        "column": "V10",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "9e13a581-0027-459b-bcde-f7d755677cdf",
+      "kwargs": {
+        "column": "V11",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "cb95ebee-f858-43a3-a566-c641ba57c4d2",
+      "kwargs": {
+        "column": "V12",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "e34c541f-acfb-456b-b2ab-7c87f439cb85",
+      "kwargs": {
+        "column": "V13",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "df69f2e4-88d5-4f03-b79f-1fca6cacd773",
+      "kwargs": {
+        "column": "V14",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "df824d2f-5d57-405a-a365-dc0a6dd011e5",
+      "kwargs": {
+        "column": "V15",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "10ec0d98-d0a4-4b66-8fe4-62ac4df7c672",
+      "kwargs": {
+        "column": "V16",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "ef12d279-a789-4287-9f04-e4f19e403350",
+      "kwargs": {
+        "column": "V17",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "a7768599-b277-4321-9a46-c2167f2a067c",
+      "kwargs": {
+        "column": "V18",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "aa76e173-50da-4e3a-9c28-d87171c2a5c7",
+      "kwargs": {
+        "column": "V19",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "d340ef0d-9b17-4f6a-a157-6ec35571026e",
+      "kwargs": {
+        "column": "V20",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "01c64ee5-d9ad-4e92-ae9b-1c212d23f4a9",
+      "kwargs": {
+        "column": "V21",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "f74c9b1a-49ad-4188-bada-73b468cf1b0c",
+      "kwargs": {
+        "column": "V22",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "e91b0222-6fee-486d-834c-68639208b924",
+      "kwargs": {
+        "column": "V23",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "5d08d5fe-fc6a-43d1-860a-d029d1efcb11",
+      "kwargs": {
+        "column": "V24",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "3c76f904-931d-4602-85d7-3220c40cf990",
+      "kwargs": {
+        "column": "V25",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "a3ee2c42-89eb-47b0-a33a-9a1cd3c0deb5",
+      "kwargs": {
+        "column": "V26",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "71cc0e42-e866-4273-be3e-a07593d6bcaa",
+      "kwargs": {
+        "column": "V27",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "33b601ad-ca0f-4e83-9432-20b3f9d15b51",
+      "kwargs": {
+        "column": "V28",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "6f5d6e04-8dca-4bb2-bd44-2ebaa4ad44e0",
+      "kwargs": {
+        "column": "Amount",
+        "regex": "^[-+]?(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?$"
+      },
+      "meta": {
+        "category": "type"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    },
+    {
+      "id": "2d553ba1-da99-4bb3-91e7-a1a72f10ac32",
+      "kwargs": {
+        "column": "Time",
+        "max_value": 172800.0,
+        "min_value": 0.0
+      },
+      "meta": {
+        "category": "validity"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_be_numeric_between"
+    },
+    {
+      "id": "3d36dcde-ad77-4e70-8b9c-d7db4459a8ed",
+      "kwargs": {
+        "column": "Amount",
+        "min_value": 0.0
+      },
+      "meta": {
+        "category": "validity"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_be_numeric_between"
+    },
+    {
+      "id": "956cf86d-e3af-47de-b06b-0d45e31ba496",
+      "kwargs": {
+        "column": "time_period",
+        "value_set": [
+          "night",
+          "morning",
+          "afternoon",
+          "evening"
+        ]
+      },
+      "meta": {
+        "category": "consistency"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_be_in_set"
+    },
+    {
+      "id": "515bf4f3-6681-4270-b122-5229256eb833",
+      "kwargs": {
+        "column": "Class",
+        "value_set": [
+          "0",
+          "1"
+        ]
+      },
+      "meta": {
+        "category": "consistency"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_be_in_set"
+    },
+    {
+      "id": "fc36f200-ead5-47ec-8372-ccaf5e8903db",
+      "kwargs": {
+        "column": "transaction_id"
+      },
+      "meta": {
+        "category": "duplicate"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_be_unique"
+    },
+    {
+      "id": "4d3fba53-95ee-431c-bc4c-9ff2e11717db",
+      "kwargs": {
+        "column": "Amount",
+        "max_value": 30000.0
+      },
+      "meta": {
+        "category": "outlier"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_be_numeric_between"
+    },
+    {
+      "id": "29d30886-8fc4-4b5a-b543-e571268ba0a3",
+      "kwargs": {
+        "column": "transaction_id",
+        "regex": "^TX\\d{8}$"
+      },
+      "meta": {
+        "category": "format"
+      },
+      "severity": "critical",
+      "type": "expect_column_values_to_match_regex"
+    }
+  ],
+  "id": "524405ed-521d-4fae-9185-166d7d7144f1",
+  "meta": {
+    "great_expectations_version": "1.24.0"
+  },
+  "name": "creditcard_suite",
+  "notes": null
+}

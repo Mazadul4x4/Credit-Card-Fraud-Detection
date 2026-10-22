@@ -1,8 +1,19 @@
-from pydantic import BaseModel, Field
+from datetime import datetime
+from typing import Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
+
+TimePeriod = Literal["night", "morning", "afternoon", "evening"]
+Source = Literal["webapp", "scheduled"]
 
 
-class TransactionFeatures(BaseModel):
-    Time: float
+class Transaction(BaseModel):
+    """Input features of one transaction. Pydantic rejects bad input with a 422."""
+
+    model_config = ConfigDict(extra="ignore")  # e.g. the Class label in ingested files
+
+    transaction_id: Optional[str] = Field(default=None, max_length=50)
+    Time: float = Field(ge=0, description="seconds since the first transaction")
     V1: float
     V2: float
     V3: float
@@ -31,29 +42,47 @@ class TransactionFeatures(BaseModel):
     V26: float
     V27: float
     V28: float
-    Amount: float
+    Amount: float = Field(ge=0)
+    time_period: TimePeriod
 
 
-class PredictionResult(BaseModel):
-    predicted_class: int
-    probability: float
+class PredictionRequest(BaseModel):
+    transactions: list[Transaction] = Field(min_length=1, max_length=50_000)
+    source: Source = "webapp"
 
 
-class BatchPredictionRequest(BaseModel):
-    transactions: list[TransactionFeatures]
-
-
-class BatchPredictionResponse(BaseModel):
-    predictions: list[PredictionResult]
-    model_version: str
+class PredictionItem(BaseModel):
+    id: int
+    transaction_id: Optional[str]
+    prediction: int
+    label: Literal["fraud", "legit"]
+    fraud_probability: float
 
 
 class PredictionResponse(BaseModel):
+    model_version: str
+    source: Source
+    count: int
+    predictions: list[PredictionItem]
+
+
+class PastPrediction(BaseModel):
     id: int
-    predicted_class: int
-    probability: float
+    created_at: datetime
     source: str
     model_version: str
+    transaction_id: Optional[str]
+    prediction: int
+    fraud_probability: float
+    features: dict[str, float | str]
 
-    class Config:
-        from_attributes = True
+
+class PastPredictionsResponse(BaseModel):
+    count: int
+    predictions: list[PastPrediction]
+
+
+class HealthResponse(BaseModel):
+    status: str
+    model_loaded: bool
+    model_version: Optional[str]

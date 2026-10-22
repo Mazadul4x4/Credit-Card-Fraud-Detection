@@ -1,217 +1,145 @@
-from __future__ import annotations
+"""Data ingestion DAG (every minute).
+
+read_data -> validate_data -> [save_statistics, send_alerts, split_and_save_data]
+"""
+
 import os
-import requests
 import random
-import shutil
 from datetime import datetime
 from pathlib import Path
-from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 import pandas as pd
-import great_expectations as gx
-from airflow.decorators import dag, task
 from airflow.exceptions import AirflowSkipException
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.sdk import dag, task
 
-RAW_DATA_DIR = Path("/opt/airflow/data/raw_data")
-GX_PROJECT_ROOT = "/opt/airflow/src/gx"
+DATA_DIR = Path(os.getenv("DATA_DIR", "/opt/airflow/data"))
+RAW_DATA = DATA_DIR / "raw_data"
+GOOD_DATA = DATA_DIR / "good_data"
+BAD_DATA = DATA_DIR / "bad_data"
+POSTGRES_CONN_ID = "dsp_postgres"  # Airflow Connection created by the airflow-init container
+
+
+def content_to_dataframe(content: dict) -> pd.DataFrame:
+    """Rebuild the file from the XCom content. Values stay text; empty cells become null."""
+    df = pd.DataFrame(content["rows"], columns=content["columns"], dtype=object)
+    return df.replace({"": None})
 
 
 @dag(
-    dag_id="credit_card_ingestion",
+    dag_id="data_ingestion",
+    description="Ingest one raw file per minute, validate it with Great Expectations",
+    schedule="* * * * *",
     start_date=datetime(2026, 1, 1),
-    schedule="* * * * *",  # every minute
     catchup=False,
-    tags=["credit-card", "ingestion"],
+    max_active_runs=1,  # one validation at a time (shared GX project folder)
+    tags=["dsp", "ingestion"],
 )
-def credit_card_ingestion():
-
+def data_ingestion():
     @task
     def read_data() -> dict:
-        files = sorted(RAW_DATA_DIR.glob("*.csv"))
-
+        """Pick ONE random file from raw_data, return its content + path, delete it."""
+        files = list(RAW_DATA.glob("*.csv"))
         if not files:
-            raise AirflowSkipException("No raw_data files found.")
+            raise AirflowSkipException("No file in raw_data")
 
-        file_path = random.choice(files)
-
+        path = random.choice(files)
+        df = pd.read_csv(path, dtype=str, keep_default_na=False)
+        path.unlink()  # avoid re-processing the same file
+        print(f"Read {path.name}: {len(df)} rows, {len(df.columns)} columns")
         return {
-            "file_path": str(file_path)
+            "file_name": path.name,
+            "file_path": str(path),
+            "content": {"columns": list(df.columns), "rows": df.values.tolist()},
         }
 
     @task
     def validate_data(payload: dict) -> dict:
-        file_path = payload["file_path"]
+        """Run the Great Expectations checkpoint and compute the criticality."""
+        from fraud_pipeline.validation import run_checkpoint
 
-        # Load GX context
-        context = gx.get_context(
-            mode="file",
-            project_root_dir=GX_PROJECT_ROOT,
+        df = content_to_dataframe(payload["content"])
+        summary = run_checkpoint(df, payload["file_name"])
+        summary["file_name"] = payload["file_name"]
+        print(
+            f"{payload['file_name']}: criticality={summary['criticality']} "
+            f"invalid={summary['invalid_rows']}/{summary['total_rows']} "
+            f"errors={summary['error_counts']} report={summary['report_path']}"
         )
-
-        # Load checkpoint
-        checkpoint = context.checkpoints.get("creditcard_checkpoint")
-
-        # Run validation
-        result = checkpoint.run()
-
-        # Build Data Docs
-        context.build_data_docs()
-
-        # Read the file again to compute summary counts for the alert
-        df = pd.read_csv(file_path)
-        total_rows = int(len(df))
-
-        required_columns = {"Time", "Amount", "Class"}
-        missing_columns = sorted(required_columns - set(df.columns))
-
-        if missing_columns:
-            invalid_rows = total_rows
-        else:
-            invalid_mask = (
-                df["Class"].isna()
-                | ~df["Class"].isin([0, 1])
-                | df["Amount"].isna()
-                | (df["Amount"] < 0)
-                | df["Time"].isna()
-                | (df["Time"] < 0)
-            )
-            invalid_rows = int(invalid_mask.sum())
-
-        return {
-            "file_path": file_path,
-            "validation_success": bool(result.success),
-            "total_rows": total_rows,
-            "invalid_rows": invalid_rows,
-            "missing_columns": missing_columns,
-            "report_file": "pandas-creditcard_csv.html",
-        }
+        return summary
 
     @task
-    def save_statistics(validation_result: dict) -> dict: 
-        file_path = validation_result["file_path"]
-        
-
-        hook = PostgresHook(postgres_conn_id="postgres_default")
-
-        filename = Path(file_path).name
-        records_processed = validation_result["total_rows"] # type: ignore
-        records_loaded = (
-        validation_result["total_rows"]
-        if validation_result["validation_success"]
-        else 0
-        )  
-        
-        status = "SUCCESS" if validation_result["validation_success"] else "FAILED"
-
+    def save_statistics(summary: dict) -> None:
+        """Save summary statistics (not raw rows) to the database."""
+        counts = summary["error_counts"]
+        hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
         hook.run(
-          """
-          INSERT INTO ingestion_stats
-          (filename, records_processed, records_loaded, status, created_at)
-          VALUES (%s, %s, %s, %s, NOW())
-          """,
-          parameters=(
-            filename,
-            records_processed,
-            records_loaded,
-           status,
-          ),
+            """
+            INSERT INTO ingestion_stats (
+                created_at, file_name, total_rows, valid_rows, invalid_rows, invalid_ratio,
+                criticality, missing_columns,
+                completeness_errors, validity_errors, consistency_errors, schema_errors,
+                type_errors, duplicate_errors, outlier_errors, format_errors, report_path
+            ) VALUES (NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            parameters=(
+                summary["file_name"],
+                summary["total_rows"],
+                summary["valid_rows"],
+                summary["invalid_rows"],
+                summary["invalid_ratio"],
+                summary["criticality"],
+                ",".join(summary["missing_columns"]) or None,
+                counts["completeness"],
+                counts["validity"],
+                counts["consistency"],
+                counts["schema"],
+                counts["type"],
+                counts["duplicate"],
+                counts["outlier"],
+                counts["format"],
+                summary["report_path"] or None,
+            ),
         )
+        print(f"Statistics saved for {summary['file_name']}")
 
-        print(f"Saved statistics for {filename}")
-
-        return {
-          "filename": filename,
-          "records_processed": records_processed,
-          "records_loaded": records_loaded,
-          "status": status,
-        }
-    
     @task
-    def send_alerts(validation_result: dict):
-        total_rows = validation_result["total_rows"]
-        invalid_rows = validation_result["invalid_rows"]
-        missing_columns = validation_result["missing_columns"]
-        report_file = validation_result["report_file"]
-        file_name = Path(validation_result["file_path"]).name
+    def send_alerts(summary: dict) -> None:
+        """Teams alert to 'Data Quality Alerts' for MEDIUM and HIGH criticality only."""
+        from fraud_pipeline.alerts import build_data_quality_card, report_link, send_teams
 
-        if total_rows == 0:
-            print("No alert: empty file.")
-            return {"alert_sent": False, "criticality": "NONE"}
+        criticality = summary["criticality"]
+        if criticality not in ("MEDIUM", "HIGH"):
+            print(f"No alert (criticality {criticality})")
+            return
 
-        invalid_pct = (invalid_rows / total_rows) * 100
+        report = report_link(summary["report_path"], os.getenv("DATA_DOCS_BASE_URL", ""))
+        card = build_data_quality_card(summary["file_name"], summary, report)
+        sent = send_teams(os.getenv("TEAMS_WEBHOOK_DATA_QUALITY", ""), card)
+        print(f"{criticality} alert {'sent to Teams' if sent else 'NOT sent (no webhook configured)'}")
 
-        if missing_columns or invalid_pct > 50:
-            criticality = "HIGH"
-        elif invalid_pct >= 10:
-            criticality = "MEDIUM"
-        elif invalid_pct > 0:
-            criticality = "LOW"
-        else:
-            print("No alert: no data quality issues detected.")
-            return {
-                "alert_sent": False,
-                "criticality": "NONE",
-                "report_file": report_file,
-            }
-
-        alert_text = (
-            f"Data Quality Alert\n"
-            f"File: {file_name}\n"
-            f"Criticality: {criticality}\n"
-            f"Total rows: {total_rows}\n"
-            f"Invalid rows: {invalid_rows}\n"
-            f"Invalid %: {invalid_pct:.2f}\n"
-            f"Missing columns: {', '.join(missing_columns) if missing_columns else 'None'}\n"
-            f"Report file: {report_file}"
-        )
-
-        # Only notify for medium/high
-        if criticality in {"MEDIUM", "HIGH"}:
-            webhook_url = os.getenv("TEAMS_WEBHOOK_URL")
-            if webhook_url:
-                response = requests.post(webhook_url, json={"text": alert_text}, timeout=15)
-                response.raise_for_status()
-                print("Teams alert sent.")
-            else:
-                print("TEAMS_WEBHOOK_URL not set. Alert preview:")
-                print(alert_text)
-
-        return {
-            "alert_sent": criticality in {"MEDIUM", "HIGH"},
-            "criticality": criticality,
-            "invalid_rows": invalid_rows,
-            "total_rows": total_rows,
-            "invalid_pct": round(invalid_pct, 2),
-            "report_file": report_file,
-        }
     @task
-    def split_and_save_data(validation_result: dict):
+    def split_and_save_data(payload: dict, summary: dict) -> None:
+        """No issue -> good_data | all rows bad -> bad_data | otherwise split into both."""
+        df = pd.DataFrame(payload["content"]["rows"], columns=payload["content"]["columns"])
+        name = payload["file_name"]
+        bad_index = summary["invalid_row_indexes"]
+        bad = df.iloc[bad_index]
+        good = df.drop(index=bad_index)
 
-      file_path = Path(validation_result["file_path"])
+        GOOD_DATA.mkdir(parents=True, exist_ok=True)
+        BAD_DATA.mkdir(parents=True, exist_ok=True)
+        if len(good):
+            good.to_csv(GOOD_DATA / name, index=False)
+        if len(bad):
+            bad.to_csv(BAD_DATA / name, index=False)
+        print(f"{name}: {len(good)} rows -> good_data, {len(bad)} rows -> bad_data")
 
-      if not file_path.exists():
-        print(f"{file_path} does not exist.")
-        return validation_result
+    payload = read_data()
+    summary = validate_data(payload)
+    save_statistics(summary)
+    send_alerts(summary)
+    split_and_save_data(payload, summary)
 
-      if validation_result["validation_success"]:
-        destination = Path("/opt/airflow/data/archived_data") / file_path.name
-      else:
-        destination = Path("/opt/airflow/data/bad_data") / file_path.name
 
-      shutil.copy2(file_path, destination)
-
-      print(f"Moved {file_path.name} to {destination}")
-
-      return {
-        **validation_result,
-        "destination": str(destination),
-      }
-
-    raw_data = read_data()
-    validated = validate_data(raw_data)
-
-    save_statistics(validated)
-    send_alerts(validated)
-    split_and_save_data(validated)
-    
-credit_card_ingestion()
+data_ingestion()
