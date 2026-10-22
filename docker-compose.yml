@@ -1,3 +1,47 @@
+# Credit Card Fraud Detection | Defense 1 stack
+#   docker compose up -d --build
+# Services: db, api, webapp, airflow (init, api-server, scheduler, dag-processor)
+# One-off commands (data preparation, training):
+#   docker compose run --rm tools python src/<script>.py ...
+
+x-airflow-common: &airflow-common
+  build:
+    context: .
+    dockerfile: airflow/Dockerfile
+  image: dsp-fraud-airflow:latest
+  user: "${AIRFLOW_UID:-50000}:0"
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${AIRFLOW_DB:-airflow}
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET}
+    AIRFLOW__API__SECRET_KEY: ${AIRFLOW_JWT_SECRET}
+    AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: admin:admin
+    AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/simple_auth_manager_passwords.json
+    # project settings used by the DAGs
+    PYTHONPATH: /opt/airflow/src
+    DATA_DIR: /opt/airflow/data
+    GX_PROJECT_ROOT: /opt/airflow/gx_project
+    GX_ANALYTICS_ENABLED: "false"
+    API_URL: http://api:8000
+    TEAMS_WEBHOOK_DATA_QUALITY: ${TEAMS_WEBHOOK_DATA_QUALITY:-}
+    DATA_DOCS_BASE_URL: ${DATA_DOCS_BASE_URL:-}
+    POSTGRES_USER: ${POSTGRES_USER}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    POSTGRES_DB: ${POSTGRES_DB}
+    AIRFLOW_DB: ${AIRFLOW_DB:-airflow}
+  volumes: &airflow-volumes
+    - ./dags:/opt/airflow/dags
+    - ./src:/opt/airflow/src
+    - ./scripts:/opt/airflow/scripts
+    - ./data:/opt/airflow/data
+    - ./models:/opt/airflow/models
+    - ./gx_project:/opt/airflow/gx_project
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/config/simple_auth_manager_passwords.json:/opt/airflow/simple_auth_manager_passwords.json
+
 services:
   db:
     image: postgres:16
@@ -8,7 +52,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,13 +66,120 @@ services:
       context: .
       dockerfile: model_service/Dockerfile
     container_name: fraud_api
-    env_file:
-      - .env
+    restart: always
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      MODEL_PATH: /app/models/fraud_model.joblib
+      MODEL_METADATA_PATH: /app/models/model_metadata.json
+    volumes:
+      - ./models:/app/models:ro
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+
+  webapp:
+    build:
+      context: .
+      dockerfile: webapp/Dockerfile
+    container_name: fraud_webapp
+    restart: always
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Runs as root once, only to make the mounted folders writable for the airflow user (Linux hosts)
+  airflow-permissions:
+    <<: *airflow-common
+    user: "0:0"
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -p /opt/airflow/logs /opt/airflow/gx_project /opt/airflow/models \
+                 /opt/airflow/data/raw_data /opt/airflow/data/good_data \
+                 /opt/airflow/data/bad_data /opt/airflow/data/archived_data
+        chown -R "${AIRFLOW_UID:-50000}:0" /opt/airflow/logs /opt/airflow/gx_project \
+                 /opt/airflow/models /opt/airflow/data
+        echo "permissions ok"
+
+  airflow-init:
+    <<: *airflow-common
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        python /opt/airflow/scripts/ensure_airflow_db.py
+        airflow db migrate
+        airflow connections delete dsp_postgres >/dev/null 2>&1 || true
+        airflow connections add dsp_postgres --conn-type postgres --conn-host db --conn-port 5432 \
+          --conn-login "$${POSTGRES_USER}" --conn-password "$${POSTGRES_PASSWORD}" --conn-schema "$${POSTGRES_DB}"
+        python /opt/airflow/src/setup_gx.py
+    depends_on:
+      airflow-permissions:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      api:
+        condition: service_healthy  # the API creates the predictions / ingestion_stats tables
+
+  airflow-apiserver:
+    <<: *airflow-common
+    container_name: airflow_apiserver
+    command: api-server
+    restart: always
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/version"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow_scheduler
+    command: scheduler
+    restart: always
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    container_name: airflow_dag_processor
+    command: dag-processor
+    restart: always
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  # One-off commands only (not started by `docker compose up`):
+  #   docker compose run --rm tools python src/train.py
+  tools:
+    <<: *airflow-common
+    working_dir: /opt/airflow
+    profiles: ["tools"]
+    environment:
+      <<: *airflow-env
+      CONNECTION_CHECK_MAX_COUNT: "0"  # scripts do not need the database
+      PYTHONPATH: /opt/airflow/src
+    volumes:
+      - ./src:/opt/airflow/src
+      - ./data:/opt/airflow/data
+      - ./models:/opt/airflow/models
+      - ./gx_project:/opt/airflow/gx_project
+    depends_on: []
 
 volumes:
   postgres_data:

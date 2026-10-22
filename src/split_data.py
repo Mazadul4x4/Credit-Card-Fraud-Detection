@@ -1,24 +1,55 @@
-import os
+"""Split a dataset into N files of exactly 10 rows each, stored in the raw_data folder.
+
+Usage:
+    python src/split_data.py <dataset_path> <raw_data_folder> <number_of_files>
+    python src/split_data.py data/production.csv data/raw_data 40
+"""
+
+import argparse
+from datetime import datetime
+from pathlib import Path
+
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
-RAW_DATA = "/opt/airflow/data/raw_data/creditcard.csv"
-GOOD_DATA = "/opt/airflow/data/good_data"
+ROWS_PER_FILE = 10
 
-os.makedirs(GOOD_DATA, exist_ok=True)
 
-df = pd.read_csv(RAW_DATA)
+def split_dataset(df: pd.DataFrame, output_dir: Path, number_of_files: int, seed=None) -> list[Path]:
+    needed = number_of_files * ROWS_PER_FILE
+    if number_of_files <= 0:
+        raise ValueError("number_of_files must be > 0")
+    if needed > len(df):
+        raise ValueError(
+            f"{number_of_files} files x {ROWS_PER_FILE} rows = {needed} rows, "
+            f"but the dataset only has {len(df)} rows"
+        )
 
-train_df, test_df = train_test_split(
-    df,
-    test_size=0.2,
-    random_state=42,
-    stratify=df["Class"],
-)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    sample = df.sample(n=needed, random_state=seed).reset_index(drop=True)
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-train_df.to_csv(f"{GOOD_DATA}/train.csv", index=False)
-test_df.to_csv(f"{GOOD_DATA}/test.csv", index=False)
+    paths = []
+    for i in range(number_of_files):
+        chunk = sample.iloc[i * ROWS_PER_FILE : (i + 1) * ROWS_PER_FILE]
+        path = output_dir / f"batch_{stamp}_{i + 1:04d}.csv"
+        chunk.to_csv(path, index=False)
+        paths.append(path)
+    return paths
 
-print("Train shape:", train_df.shape)
-print("Test shape:", test_df.shape)
-print("Files saved successfully.")
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument("dataset_path")
+    parser.add_argument("raw_data_folder")
+    parser.add_argument("number_of_files", type=int)
+    parser.add_argument("--seed", type=int, default=None)
+    args = parser.parse_args()
+
+    # read as text so values are written back exactly as they were
+    df = pd.read_csv(args.dataset_path, dtype=str, keep_default_na=False)
+    paths = split_dataset(df, Path(args.raw_data_folder), args.number_of_files, args.seed)
+    print(f"Created {len(paths)} files of {ROWS_PER_FILE} rows in {args.raw_data_folder}")
+
+
+if __name__ == "__main__":
+    main()
