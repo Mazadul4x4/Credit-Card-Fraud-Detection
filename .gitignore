@@ -27,3 +27,4 @@ models/*
 
 # Great Expectations: validation results + Data Docs are generated at runtime
 gx_project/gx/uncommitted/
+src/gx/
