@@ -1,33 +1,21 @@
-import great_expectations as gx
-from great_expectations.checkpoint import UpdateDataDocsAction
+"""Create checkpoint for Great Expectations."""
 
-context = gx.get_context(
-    mode="file",
-    project_root_dir="/opt/airflow/src/gx/gx",
-)
+from __future__ import annotations
 
-# Get validation definition
-validation_definition = context.validation_definitions.get(
-    "creditcard_validation"
-)
+import logging
 
-try:
-    checkpoint = gx.Checkpoint(
-        name="creditcard_checkpoint",
-        validation_definitions=[validation_definition],
-        actions=[
-            UpdateDataDocsAction(
-                name="update_data_docs"
-            )
-        ],
-        result_format={
-            "result_format": "COMPLETE"
-        },
-    )
+from src.gx_validator import configure_suite, get_gx_context, setup_checkpoint_for_dataframe
 
-    context.checkpoints.add(checkpoint)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
-    print("✓ Checkpoint created.")
 
-except Exception:
-    print("✓ Checkpoint already exists.")
+def main() -> None:
+    context = get_gx_context()
+    suite = configure_suite(context)
+    checkpoint = setup_checkpoint_for_dataframe(context, suite)
+    logger.info(f"Checkpoint ready: {checkpoint.name}")
+
+
+if __name__ == "__main__":
+    main()

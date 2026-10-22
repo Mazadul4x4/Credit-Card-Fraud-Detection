@@ -7,4 +7,6 @@ RUN pip install --no-cache-dir \
     numpy \
     scikit-learn \
     psycopg2-binary \
-    great-expectations
+    great-expectations \
+    requests \
+    joblib

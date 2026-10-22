@@ -1,23 +1,34 @@
-import pandas as pd
-import great_expectations as gx
+"""Run checkpoint and generate Data Docs."""
 
-context = gx.get_context(
-    mode="file",
-    project_root_dir="/opt/airflow/src/gx/gx",
-)
+from __future__ import annotations
 
-# Load checkpoint
-checkpoint = context.checkpoints.get("creditcard_checkpoint")
+import argparse
+import logging
+from pathlib import Path
 
-# Read a sample of your dataset
-df = pd.read_csv("/opt/airflow/data/good_data/train.csv").head(100)
+from src.gx_validator import validate_file
 
-# Run validation
-result = checkpoint.run()
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
-print("Validation Success:", result.success)
 
-# Build Data Docs
-context.build_data_docs()
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Run GX checkpoint on a file")
+    parser.add_argument("--file", default="data/good_data/test.csv", help="File to validate")
+    args = parser.parse_args()
 
-print("Data Docs generated successfully!")
+    file_to_validate = Path(args.file)
+    if not file_to_validate.exists():
+        alt = Path("data/raw_data/creditcard.csv")
+        if alt.exists():
+            file_to_validate = alt
+
+    logger.info(f"Validating file: {file_to_validate}")
+    results = validate_file(file_to_validate)
+    logger.info(f"Validation success: {results['validation_success']}")
+    logger.info(f"Criticality: {results['criticality']}")
+    logger.info(f"Data Docs report: {results['report_file']}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,12 @@
+.git
+.gitignore
+.DS_Store
+data/
+airflow/logs/
+src/gx/gx/uncommitted/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+tests/
